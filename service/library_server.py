@@ -59,8 +59,12 @@ class InventoryService(library_pb2_grpc.InventoryServiceServicer):
     
     def getBook(self, request, context):
         # retrieve the book from the database
-        book = database.get(request.isbn)
-        return library_pb2.Book(isbn = book.isbn, title = book.title, author = book.author, genre = book.genre, year = book.year)
+        if request.isbn in database:
+            book = database.get(request.isbn)
+            return library_pb2.Book(isbn = book.isbn, title = book.title, author = book.author, genre = book.genre, year = book.year)
+        
+        else:
+            return library_pb2.Book(isbn='This book does not exist in the database!')
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
